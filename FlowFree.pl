@@ -40,15 +40,15 @@ package FlowFree::Display;
 
     use Data::Dumper;
 
-    use Const::Fast;
-
 use constant box_chars => [
     [qw[    ╹ ┗ ┃ ┛         ]],     # up
     [qw[    ┗ ╺ ┏ ━         ]],     # right
     [qw[    ┃ ┏ ╻ ┓         ]],     # down
     [qw[    ┛ ━ ┓ ╸         ]]  ];  # left
 
-const my $circle_diacritic => "\x20dd";
+#use constant circle_diacritic => " ⃝";
+use constant circle_diacritic => "";
+#use constant circle_diacritic => "̳";
 
 sub new { bless {}, shift }
 
@@ -82,7 +82,7 @@ sub draw_path {
 
     ## draw start-segment
     my $dir = $direction_list->[0];
-    $self->{grid}[$x][$y] = box_chars->[$dir][$dir];
+    $self->{grid}[$x][$y] = box_chars->[$dir][$dir] . circle_diacritic;
     $self->{gridcolor}[$x][$y] = $color;
     #print "($x,$y)  $dir→$dir\n";
 
@@ -102,7 +102,7 @@ sub draw_path {
     $x += $dir_delta[$dir][0];
     $y += $dir_delta[$dir][1];
     $dir = ::flip($dir);
-    $self->{grid}[$x][$y] = box_chars->[$dir][$dir];
+    $self->{grid}[$x][$y] = box_chars->[$dir][$dir] . circle_diacritic;
     $self->{gridcolor}[$x][$y] = $color;
 }
 
