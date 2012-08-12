@@ -1,5 +1,8 @@
 package FlowFree::Display;
 
+# instances of this class are frame-buffers...  a grid that can be drawn on, and sent to the
+# terminal
+
     use strict;
     use warnings;
 
