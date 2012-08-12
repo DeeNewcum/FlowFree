@@ -1,6 +1,11 @@
 #!/usr/bin/perl
 
-# <short description of program>
+# A brute-force solver for FlowFree-style game boards.
+
+# This runs in text mode, and it expects your terminal emulator to be able to:
+#       - display Unicode characters
+#       - handle 256 colors
+
 
     use strict;
     use warnings;
@@ -11,8 +16,8 @@
     #use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
 
 
-const my $UP    => 0;
-const my $RIGHT => 1;
+const my $UP    => 0;       # Conventions we use for directions.
+const my $RIGHT => 1;       # Often, we just use the numbers.
 const my $DOWN  => 2;
 const my $LEFT  => 3;
 
@@ -24,8 +29,8 @@ sub flip {($_[0]+2)%4}
 
 my $display = new FlowFree::Display;
 $display->resize(3,3);
-$display->draw_path(1,   0, 0,   [1, 2, 3]);
-$display->draw_path(2,   2, 0,   [2, 2, 3, 3]);
+$display->draw_path(9,   [0, 0],   [1, 2, 3]);
+$display->draw_path(10,   [2, 0],   [2, 2, 3, 3]);
 print $display->to_string();
 
 #print Dumper $display;
@@ -45,6 +50,19 @@ use constant box_chars => [
     [qw[    ┗ ╺ ┏ ━         ]],     # right
     [qw[    ┃ ┏ ╻ ┓         ]],     # down
     [qw[    ┛ ━ ┓ ╸         ]]  ];  # left
+
+# map from bright colors => darker color pair 
+#       (used to produce a checkerboard effect)
+use constant dark_colors => {
+    8 => 0,
+    9 => 1,
+    10 => 2,
+    11 => 3,
+    12 => 4,
+    13 => 5,
+    14 => 6,
+    15 => 7,
+};
 
 #use constant circle_diacritic => " ⃝";
 use constant circle_diacritic => "";
@@ -75,15 +93,18 @@ sub resize {
 
 # color should be one of these:  http://www.mudpedia.org/wiki/Xterm_256_colors
 sub draw_path {
-    my ($self, $color, $start_x, $start_y, $direction_list) = @_;
+    my ($self, $color_hi, $start_coord, $direction_list) = @_;
     
-    my $x = $start_x;
-    my $y = $start_y;
+    my $x = $start_coord->[0];
+    my $y = $start_coord->[1];
+
+    my $color_lo = dark_colors->{$color_hi};
+    $color_lo = $color_hi   if (!defined($color_lo));
 
     ## draw start-segment
     my $dir = $direction_list->[0];
     $self->{grid}[$x][$y] = box_chars->[$dir][$dir] . circle_diacritic;
-    $self->{gridcolor}[$x][$y] = $color;
+    $self->{gridcolor}[$x][$y] = ($x+$y)%2 ? $color_hi : $color_lo;
     #print "($x,$y)  $dir→$dir\n";
 
     ## draw intermediate segments
@@ -93,9 +114,9 @@ sub draw_path {
         $x += $dir_delta[$dir][0];
         $y += $dir_delta[$dir][1];
         $self->{grid}[$x][$y] = box_chars->[::flip($dir)][$next_dir];
-        $self->{gridcolor}[$x][$y] = $color;
+        $self->{gridcolor}[$x][$y] = ($x+$y)%2 ? $color_hi : $color_lo;
         #print "($x,$y)  $dir→$next_dir\n";
-    }
+   }
 
     ## draw finish-segment
     $dir = $direction_list->[-1];
@@ -103,7 +124,7 @@ sub draw_path {
     $y += $dir_delta[$dir][1];
     $dir = ::flip($dir);
     $self->{grid}[$x][$y] = box_chars->[$dir][$dir] . circle_diacritic;
-    $self->{gridcolor}[$x][$y] = $color;
+    $self->{gridcolor}[$x][$y] = ($x+$y)%2 ? $color_hi : $color_lo;
 }
 
 
