@@ -10,6 +10,8 @@
     use strict;
     use warnings;
 
+    BEGIN { chdir ".." }
+
     require "./mainspace.pm";
     require "./Display.pm";
 
@@ -17,7 +19,6 @@
 
     use Data::Dumper;
     #use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
-
 
 
 my $display = new FlowFree::Display;

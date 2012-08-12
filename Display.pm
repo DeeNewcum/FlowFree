@@ -65,9 +65,14 @@ sub draw_path {
     $color_lo = $color_hi   if (!defined($color_lo));
 
     ## draw start-segment
+    $self->{gridcolor}[$x][$y] = ($x+$y)%2 ? $color_hi : $color_lo;
+    # if the list is a single 'undef' value, then just draw a dot
+    if (@$direction_list == 1 && !defined($direction_list->[0])) {
+        $self->{grid}[$x][$y] = "○";
+        return;
+    }
     my $dir = $direction_list->[0];
     $self->{grid}[$x][$y] = box_chars->[$dir][$dir] . circle_diacritic;
-    $self->{gridcolor}[$x][$y] = ($x+$y)%2 ? $color_hi : $color_lo;
     #print "($x,$y)  $dir→$dir\n";
 
     ## draw intermediate segments
