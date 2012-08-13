@@ -30,7 +30,7 @@ use constant arrow_chars => [qw[ ⇑ ⇒  ⇓ ⇐ ]];
 #       (used to produce a checkerboard effect)
 # color should be one of these:  http://www.mudpedia.org/wiki/Xterm_256_colors
 use constant dark_colors => {
-    8 => 0,
+    237 => 235,       # black / dark gray
     9 => 88,        # red
     10 => 34,       # green
     11 => 3,
@@ -46,6 +46,14 @@ use constant fg_colors => {
     #10 => 0,        # green
     11 => 0,        # yellow
 };
+
+#use constant start_stop => "o";
+#use constant start_stop => "•";
+use constant start_stop => "ꔷ";
+#use constant start_stop => "⚫";
+#use constant start_stop => "·";
+#use constant start_stop => "▚";
+
 
 #use constant circle_diacritic => " ⃝";
 use constant circle_diacritic => "";
@@ -70,7 +78,7 @@ sub resize {
 
     foreach my $y (0..($height-1)) {
         foreach my $x (0..($width-1)) {
-            $self->{gridcolor}[$x][$y] = 8      if (($x+$y)%2);
+            $self->{gridcolor}[$x][$y] = 237;
         }
     }
 }
@@ -88,17 +96,14 @@ sub draw_path {
     
     my $x = $start_coord->[0];
     my $y = $start_coord->[1];
+    
+    my $errant_move = undef;
 
     ## draw start-segment
     $self->{gridcolor}[$x][$y] = $color_hi;
     # if the list is a single 'undef' value, then just draw a dot
     if (@$direction_list == 1 && !defined($direction_list->[0])) {
-        #$self->{grid}[$x][$y] = "o";
-        #$self->{grid}[$x][$y] = "•";
-        $self->{grid}[$x][$y] = "ꔷ";
-        #$self->{grid}[$x][$y] = "⚫";
-        #$self->{grid}[$x][$y] = "·";
-        #$self->{grid}[$x][$y] = "▚";
+        $self->{grid}[$x][$y] = start_stop;
         return;
     }
     my $dir = $direction_list->[0];
@@ -111,14 +116,17 @@ sub draw_path {
         my $next_dir = $direction_list->[$ctr+1];
         $x += $::dir_delta[$dir][0];
         $y += $::dir_delta[$dir][1];
-        last if (!$self->is_blank_square($x, $y));
+        if (!$self->is_blank_square($x, $y)) {
+            $errant_move = $ctr;
+            last;
+        }
         $self->{grid}[$x][$y] = box_chars->[::flip($dir)][$next_dir];
         $self->{gridcolor}[$x][$y] = $color_hi;
         #print "($x,$y)  $dir→$next_dir\n";
     }
 
     ## draw finish-segment
-    if ($self->is_blank_square($x, $y, $color_hi)) {
+    if (!defined($errant_move)) {
         $dir = $direction_list->[-1];
         $x += $::dir_delta[$dir][0];
         $y += $::dir_delta[$dir][1];
@@ -126,26 +134,26 @@ sub draw_path {
             $dir = ::flip($dir);
             $self->{grid}[$x][$y] = box_chars->[$dir][$dir] . circle_diacritic;
             $self->{gridcolor}[$x][$y] = $color_hi;
+        } else {
+            $errant_move = scalar(@$direction_list) - 1;
         }
     }
 
     ## if we ever left the board, draw an arrow indicating the direction we were headed
-    if (1 && !$self->is_blank_square($x, $y, $color_hi)) {
+    if (defined($errant_move)) {
         $x = $start_coord->[0];
         $y = $start_coord->[1];
-        for (my $ctr=0; $ctr<@$direction_list; $ctr++) {
-            my ($lx, $ly) = ($x, $y);
+        for (my $ctr=0; $ctr<$errant_move; $ctr++) {
             $dir = $direction_list->[$ctr];
             $x += $::dir_delta[$dir][0];
             $y += $::dir_delta[$dir][1];
-            if (!$self->is_blank_square($x, $y, $color_hi)) {
-                # go back one step
-                $self->{grid}[$lx][$ly] = arrow_chars->[$dir];
-                last;
-            }
         }
+        $dir = $direction_list->[$errant_move];
+        $self->{grid}[$x][$y] = arrow_chars->[$dir];
     }
 }
+
+
 
 
 sub to_string {
@@ -194,7 +202,8 @@ sub is_blank_square {
 
     $self->is_inside($x, $y)
         && ((defined($color) && $self->{gridcolor}[$x][$y] == $color)
-            || $self->{grid}[$x][$y] eq ' ');
+            || $self->{grid}[$x][$y] eq ' '
+            || $self->{grid}[$x][$y] eq start_stop);
 }
 
 

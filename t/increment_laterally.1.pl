@@ -26,8 +26,8 @@ my $board = new FlowFree::InitialBoard(
     height => 3,
     width  => 3,
     pairs => [
-        [9,     0, 0,       0, 1],
-        [11,    0, 2,       2, 0],
+        [9,     0, 1,       0, 2],
+        [11,    0, 0,       2, 2],
     ],
 );
 my $framebuf = new FlowFree::Framebuf;                                                                 
@@ -37,8 +37,8 @@ print $board->draw($framebuf)->to_string(), "\n";
 
 my $pathset = new FlowFree::PathSet($board);
 $pathset->{paths} = [
-        [1, 2, 1],
-        [1, 1, 0, 1],
+        [1, 2, 0],
+        [1, 1, 2, 0],
     ];
 
 print $pathset->draw($framebuf)->to_string();
