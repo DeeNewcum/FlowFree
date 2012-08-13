@@ -28,19 +28,38 @@ sub new {
     my $class = shift;
 
     if (ref($_[0]) eq 'FlowFree::PathSet') {
-        my %$clone = %{shift};
+        my %clone = %{shift()};
         my $self = {
             paths => dclone( $clone{paths} ),
             board => $clone{board},
         };
         return bless $self, $class;
     } else {
-        my $initial_board = shift;
+        my $initial_board = shift;          # a FlowFree::InitialBoard object
         my $self = {
             board => $initial_board,
         };
         return bless $self, $class;
     }
+}
+
+
+sub draw {
+    my ($self, $framebuf) = @_;
+
+    $framebuf->resize( $self->{board}{width}, $self->{board}{height} );
+
+    my @board_paths = @{ $self->{board}{pairs} };
+    for my $pathnum (0 .. scalar(@board_paths)-1) {
+        $framebuf->draw_path(
+                $board_paths[$pathnum][0],       # color
+                [  $board_paths[$pathnum][1],    # starting coordinates
+                   $board_paths[$pathnum][2]  ],
+                $self->{paths}[$pathnum],
+            );
+    }
+
+    return $framebuf;
 }
 
 

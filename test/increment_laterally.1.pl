@@ -4,11 +4,15 @@
     use strict;
     use warnings;
 
-    BEGIN { chdir ".." }
+        # improved version of FindBin
+        use Cwd 'abs_path';
+        use File::Basename;
+        use lib dirname( dirname( abs_path $0 ) );
 
-    require "./mainspace.pm";
-    require "./Framebuf.pm";
-    require "./InitialBoard.pm";
+    require "mainspace.pm";
+    require "Framebuf.pm";
+    require "InitialBoard.pm";
+    require "PathSet.pm";
 
     use Const::Fast;
 
@@ -26,11 +30,21 @@ my $board = new FlowFree::InitialBoard(
         [11,    0, 2,       2, 0],
     ],
 );
-my $display = new FlowFree::Framebuf;                                                                 
+my $framebuf = new FlowFree::Framebuf;                                                                 
 
-$board->draw($display);
-print $display->to_string();
+print $board->draw($framebuf)->to_string(), "\n";
 
-#print Dumper $display;
+
+my $pathset = new FlowFree::PathSet($board);
+$pathset->{paths} = [
+        [1, 2],
+        [1, 1, 0],
+    ];
+
+print $pathset->draw($framebuf)->to_string();
+
+
+
+#print Dumper $framebuf;
 
 

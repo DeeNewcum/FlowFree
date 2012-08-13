@@ -36,6 +36,8 @@ sub draw {
         $framebuffer->draw_path($color, [$x1, $y1], [undef]);
         $framebuffer->draw_path($color, [$x2, $y2], [undef]);
     }
+
+    return $framebuffer;        # make it possible to chain the FlowFree::Framebuf::to_string call
 }
 
 1;
