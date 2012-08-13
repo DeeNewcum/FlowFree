@@ -37,8 +37,8 @@ print $board->draw($framebuf)->to_string(), "\n";
 
 my $pathset = new FlowFree::PathSet($board);
 $pathset->{paths} = [
-        [1, 2],
-        [1, 1, 0],
+        [1, 2, 1],
+        [1, 1, 0, 1],
     ];
 
 print $pathset->draw($framebuf)->to_string();

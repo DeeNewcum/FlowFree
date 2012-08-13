@@ -40,4 +40,17 @@ sub draw {
     return $framebuffer;        # make it possible to chain the FlowFree::Framebuf::to_string call
 }
 
+
+# given a point, determine if it's inside the board
+sub is_inside {
+    my ($self, $x, $y) = @_;
+
+       $x >= 0
+    && $y >= 0
+    && $x < $self->{width}
+    && $y < $self->{height}
+}
+
+
+
 1;

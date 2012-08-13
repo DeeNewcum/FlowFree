@@ -3,6 +3,14 @@ package FlowFree::Framebuf;
 # instances of this class are frame-buffers...  a grid that can be drawn on, and sent to the
 # terminal
 
+# monospace fonts that have enough unicode coverage for this (on Ubuntu):
+#       - Liberation Mono
+#       - Monospace
+#       - Andale Mono
+#       - Deja Vu Sans Mono
+#       - Courier New
+#       - FreeMono
+
     use strict;
     use warnings;
 
@@ -13,6 +21,10 @@ use constant box_chars => [
     [qw[    ┗ ╺ ┏ ━         ]],     # right
     [qw[    ┃ ┏ ╻ ┓         ]],     # down
     [qw[    ┛ ━ ┓ ╸         ]]  ];  # left
+
+
+#use constant arrow_chars => [qw[ ↑ → ↓ ← ]];
+use constant arrow_chars => [qw[ ⇑ ⇒  ⇓ ⇐ ]];
 
 # map from bright colors => darker color pair 
 #       (used to produce a checkerboard effect)
@@ -43,6 +55,8 @@ sub new { bless {}, shift }
 
 sub resize {
     my ($self, $width, $height) = @_;
+    $self->{width} = $width;
+    $self->{height} = $height;
     $self->{grid} = [
             map {
                     [ map { ' ' } 1..$height ]
@@ -62,6 +76,12 @@ sub resize {
 }
 
 
+sub clear {
+    my ($self) = @_;
+    $self->resize($self->{width}, $self->{height});
+}
+
+
 # color should be one of these:  http://www.mudpedia.org/wiki/Xterm_256_colors
 sub draw_path {
     my ($self, $color_hi, $start_coord, $direction_list) = @_;
@@ -73,7 +93,12 @@ sub draw_path {
     $self->{gridcolor}[$x][$y] = $color_hi;
     # if the list is a single 'undef' value, then just draw a dot
     if (@$direction_list == 1 && !defined($direction_list->[0])) {
-        $self->{grid}[$x][$y] = "O";
+        #$self->{grid}[$x][$y] = "o";
+        #$self->{grid}[$x][$y] = "•";
+        $self->{grid}[$x][$y] = "ꔷ";
+        #$self->{grid}[$x][$y] = "⚫";
+        #$self->{grid}[$x][$y] = "·";
+        #$self->{grid}[$x][$y] = "▚";
         return;
     }
     my $dir = $direction_list->[0];
@@ -86,18 +111,40 @@ sub draw_path {
         my $next_dir = $direction_list->[$ctr+1];
         $x += $::dir_delta[$dir][0];
         $y += $::dir_delta[$dir][1];
+        last if (!$self->is_blank_square($x, $y));
         $self->{grid}[$x][$y] = box_chars->[::flip($dir)][$next_dir];
         $self->{gridcolor}[$x][$y] = $color_hi;
         #print "($x,$y)  $dir→$next_dir\n";
     }
 
     ## draw finish-segment
-    $dir = $direction_list->[-1];
-    $x += $::dir_delta[$dir][0];
-    $y += $::dir_delta[$dir][1];
-    $dir = ::flip($dir);
-    $self->{grid}[$x][$y] = box_chars->[$dir][$dir] . circle_diacritic;
-    $self->{gridcolor}[$x][$y] = $color_hi;
+    if ($self->is_blank_square($x, $y, $color_hi)) {
+        $dir = $direction_list->[-1];
+        $x += $::dir_delta[$dir][0];
+        $y += $::dir_delta[$dir][1];
+        if ($self->is_blank_square($x, $y)) {
+            $dir = ::flip($dir);
+            $self->{grid}[$x][$y] = box_chars->[$dir][$dir] . circle_diacritic;
+            $self->{gridcolor}[$x][$y] = $color_hi;
+        }
+    }
+
+    ## if we ever left the board, draw an arrow indicating the direction we were headed
+    if (1 && !$self->is_blank_square($x, $y, $color_hi)) {
+        $x = $start_coord->[0];
+        $y = $start_coord->[1];
+        for (my $ctr=0; $ctr<@$direction_list; $ctr++) {
+            my ($lx, $ly) = ($x, $y);
+            $dir = $direction_list->[$ctr];
+            $x += $::dir_delta[$dir][0];
+            $y += $::dir_delta[$dir][1];
+            if (!$self->is_blank_square($x, $y, $color_hi)) {
+                # go back one step
+                $self->{grid}[$lx][$ly] = arrow_chars->[$dir];
+                last;
+            }
+        }
+    }
 }
 
 
@@ -128,5 +175,27 @@ sub to_string {
     }
     return $string;
 }
+
+
+# given a point, determine if it's inside the board
+sub is_inside {
+    my ($self, $x, $y) = @_;
+
+       $x >= 0
+    && $y >= 0
+    && $x < $self->{width}
+    && $y < $self->{height}
+}
+
+
+# given a point, determine if it's on a blank square  (AND that it's inside the board)
+sub is_blank_square {
+    my ($self, $x, $y, $color) = @_;
+
+    $self->is_inside($x, $y)
+        && ((defined($color) && $self->{gridcolor}[$x][$y] == $color)
+            || $self->{grid}[$x][$y] eq ' ');
+}
+
 
 1;

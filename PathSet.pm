@@ -47,7 +47,8 @@ sub new {
 sub draw {
     my ($self, $framebuf) = @_;
 
-    $framebuf->resize( $self->{board}{width}, $self->{board}{height} );
+    #$framebuf->resize( $self->{board}{width}, $self->{board}{height} );
+    $self->{board}->draw($framebuf);
 
     my @board_paths = @{ $self->{board}{pairs} };
     for my $pathnum (0 .. scalar(@board_paths)-1) {
