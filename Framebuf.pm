@@ -16,15 +16,23 @@ use constant box_chars => [
 
 # map from bright colors => darker color pair 
 #       (used to produce a checkerboard effect)
+# color should be one of these:  http://www.mudpedia.org/wiki/Xterm_256_colors
 use constant dark_colors => {
     8 => 0,
-    9 => 1,
-    10 => 2,
+    9 => 88,        # red
+    10 => 34,       # green
     11 => 3,
     12 => 4,
     13 => 5,
     14 => 6,
     15 => 7,
+};
+
+# Map from bright colors => fg color.
+# Usually we use white for the foreground...  if we need to use something else, specify it here.
+use constant fg_colors => {
+    #10 => 0,        # green
+    11 => 0,        # yellow
 };
 
 #use constant circle_diacritic => " ⃝";
@@ -61,11 +69,8 @@ sub draw_path {
     my $x = $start_coord->[0];
     my $y = $start_coord->[1];
 
-    my $color_lo = dark_colors->{$color_hi};
-    $color_lo = $color_hi   if (!defined($color_lo));
-
     ## draw start-segment
-    $self->{gridcolor}[$x][$y] = ($x+$y)%2 ? $color_hi : $color_lo;
+    $self->{gridcolor}[$x][$y] = $color_hi;
     # if the list is a single 'undef' value, then just draw a dot
     if (@$direction_list == 1 && !defined($direction_list->[0])) {
         $self->{grid}[$x][$y] = "O";
@@ -82,7 +87,7 @@ sub draw_path {
         $x += $::dir_delta[$dir][0];
         $y += $::dir_delta[$dir][1];
         $self->{grid}[$x][$y] = box_chars->[::flip($dir)][$next_dir];
-        $self->{gridcolor}[$x][$y] = ($x+$y)%2 ? $color_hi : $color_lo;
+        $self->{gridcolor}[$x][$y] = $color_hi;
         #print "($x,$y)  $dir→$next_dir\n";
     }
 
@@ -92,7 +97,7 @@ sub draw_path {
     $y += $::dir_delta[$dir][1];
     $dir = ::flip($dir);
     $self->{grid}[$x][$y] = box_chars->[$dir][$dir] . circle_diacritic;
-    $self->{gridcolor}[$x][$y] = ($x+$y)%2 ? $color_hi : $color_lo;
+    $self->{gridcolor}[$x][$y] = $color_hi;
 }
 
 
@@ -106,8 +111,16 @@ sub to_string {
         foreach my $x (0..($width-1)) {
             my $cell = $self->{grid}[$x][$y];
             if (length($self->{gridcolor}[$x][$y] || '')) {
-                $cell = "\e[48;5;$self->{gridcolor}[$x][$y]m$cell\e[0m";
-                #$cell = "\e[38;5;$self->{gridcolor}[$x][$y]m$cell\e[0m";
+                my $bg_brt_color = $self->{gridcolor}[$x][$y];
+                my $bg_drk_color = dark_colors->{$bg_brt_color};
+                $bg_drk_color = $bg_brt_color       if (!defined($bg_drk_color));
+                my $bg_color = ($x+$y)%2 ? $bg_brt_color : $bg_drk_color;
+
+                my $fg_color = fg_colors->{$bg_brt_color};
+                $fg_color = 15      if (!defined($fg_color));
+
+                $cell = "\e[48;5;${bg_color}m$cell\e[0m";
+                $cell = "\e[38;5;${fg_color}m$cell\e[0m";
             }
             $string .= $cell;
         }
