@@ -1,4 +1,4 @@
-package FlowFree::Display;
+package FlowFree::Framebuf;
 
 # instances of this class are frame-buffers...  a grid that can be drawn on, and sent to the
 # terminal

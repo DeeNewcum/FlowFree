@@ -7,7 +7,7 @@
     BEGIN { chdir ".." }
 
     require "./mainspace.pm";
-    require "./Display.pm";
+    require "./Framebuf.pm";
     require "./InitialBoard.pm";
 
     use Const::Fast;
@@ -26,7 +26,7 @@ my $board = new FlowFree::InitialBoard(
         [11,    0, 2,       2, 0],
     ],
 );
-my $display = new FlowFree::Display;                                                                 
+my $display = new FlowFree::Framebuf;                                                                 
 
 $board->draw($display);
 print $display->to_string();

@@ -28,7 +28,7 @@ sub new {
 
 sub draw {
     my $self = shift;
-    my $framebuffer = shift;        # a FlowFree::Display object
+    my $framebuffer = shift;        # a FlowFree::Framebuf object
 
     $framebuffer->resize( $self->{width}, $self->{height} );
     foreach my $pair (@{$self->{pairs}}) {

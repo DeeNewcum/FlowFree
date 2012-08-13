@@ -11,7 +11,7 @@
     use warnings;
 
     require "./mainspace.pm";
-    require "./Display.pm";
+    require "./Framebuf.pm";
 
     use Const::Fast;
 
@@ -20,7 +20,7 @@
 
 
 
-my $display = new FlowFree::Display;
+my $display = new FlowFree::Framebuf;
 $display->resize(4,4);
 $display->draw_path(9,   [0, 0],   [1, 2, 3]);
 $display->draw_path(10,   [2, 0],   [2, 2, 3, 3]);
