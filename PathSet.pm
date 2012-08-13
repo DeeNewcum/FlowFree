@@ -32,12 +32,16 @@ sub new {
         my $self = {
             paths => dclone( $clone{paths} ),
             board => $clone{board},
+            current_depth => $clone{current_depth},
         };
         return bless $self, $class;
     } else {
         my $initial_board = shift;          # a FlowFree::InitialBoard object
+        my $numpairs = scalar @{$initial_board->{pairs}};
         my $self = {
             board => $initial_board,
+            paths => [ map { [0] }  0..($numpairs-1) ],
+            current_depth => 0,
         };
         return bless $self, $class;
     }
@@ -67,7 +71,26 @@ sub draw {
 # "Laterally" is a direction in the game-tree:  the same direction as "width first".
 #
 # This twiddles different directions on the bottom layer of the tree.
+#
+# Returns:   false = we have tried all possible combinations for this layer
+#            true = we still have some combinations to try
 sub increment_laterally {
+    my ($self) = shift;
+
+    my $current_depth = $self->{current_depth};
+    my $more_to_go = 0;
+    for (my $ctr=0; $ctr<@{$self->{paths}}; $ctr++) {
+        next unless (exists $self->{paths}[$ctr][$current_depth]);
+        $self->{paths}[$ctr][$current_depth]++;
+        if ($self->{paths}[$ctr][$current_depth] > 3) {
+            $self->{paths}[$ctr][$current_depth] = 0;
+        } else {
+            $more_to_go = 1;
+            last;
+        }
+    }
+
+    return $more_to_go;
 }
 
 
