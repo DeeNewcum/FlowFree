@@ -14,16 +14,10 @@
     require "InitialBoard.pm";
     require "PathSet.pm";
 
-    use Carp;
     use Const::Fast;
 
     use Data::Dumper;
     #use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
-
-
-$SIG{INT} = sub {
-    Carp::carp "caught a Ctrl-C";
-};
 
 
 # level 1, "Bonus Pack"
@@ -47,11 +41,11 @@ $pathset->{paths} = [
     ];
 $pathset->{current_depth} = 2;
 
-print $pathset->draw($framebuf)->to_string();
+print $pathset->draw($framebuf)->to_string(), "\n";
 
 
 while ($pathset->increment_laterally()) {
-    print $pathset->draw($framebuf)->to_string();
+    print $pathset->draw($framebuf)->to_string(), "\n";
 }
 
 

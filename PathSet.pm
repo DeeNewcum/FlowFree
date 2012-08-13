@@ -90,6 +90,9 @@ sub increment_laterally {
         }
     }
 
+    # - TODO: we need to detect if we've finished one path, and if so, stop iterating on that one
+    # - TODO: we need to detect if we've finished all paths, and if so, return false
+
     return $more_to_go;
 }
 
