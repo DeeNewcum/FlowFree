@@ -68,7 +68,7 @@ sub draw_path {
     $self->{gridcolor}[$x][$y] = ($x+$y)%2 ? $color_hi : $color_lo;
     # if the list is a single 'undef' value, then just draw a dot
     if (@$direction_list == 1 && !defined($direction_list->[0])) {
-        $self->{grid}[$x][$y] = "○";
+        $self->{grid}[$x][$y] = "O";
         return;
     }
     my $dir = $direction_list->[0];
@@ -84,7 +84,7 @@ sub draw_path {
         $self->{grid}[$x][$y] = box_chars->[::flip($dir)][$next_dir];
         $self->{gridcolor}[$x][$y] = ($x+$y)%2 ? $color_hi : $color_lo;
         #print "($x,$y)  $dir→$next_dir\n";
-   }
+    }
 
     ## draw finish-segment
     $dir = $direction_list->[-1];
