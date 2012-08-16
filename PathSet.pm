@@ -56,6 +56,7 @@ sub draw {
 
     my @board_paths = @{ $self->{board}{pairs} };
     for my $pathnum (0 .. scalar(@board_paths)-1) {
+        next unless defined($self->{paths}[$pathnum]);
         $framebuf->draw_path(
                 $board_paths[$pathnum][0],       # color
                 [  $board_paths[$pathnum][1],    # starting coordinates

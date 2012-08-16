@@ -15,6 +15,7 @@
     require "./mainspace.pm";
     require "./Framebuf.pm";
     require "./InitialBoard.pm";
+    require "./Rasterized.pm";
 
     use Const::Fast;
 
@@ -36,8 +37,12 @@ my $board = new FlowFree::InitialBoard(
 );
 my $display = new FlowFree::Framebuf;                                                                 
 
-$board->draw($display);
-print $display->to_string();
+print $board->draw($display)->to_string(), "\n";
+
+
+my $rasterized = FlowFree::Rasterized->new($board);
+print $rasterized->draw($display)->to_string();
+
 
 #print Dumper $display;
 

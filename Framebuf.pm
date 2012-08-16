@@ -38,6 +38,7 @@ use constant dark_colors => {
     13 => 5,
     14 => 6,
     15 => 7,
+    231 => 249,     # FlowFree::Rasterized::occupied_mask
 };
 
 # Map from bright colors => fg color.
@@ -45,6 +46,7 @@ use constant dark_colors => {
 use constant fg_colors => {
     #10 => 0,        # green
     11 => 0,        # yellow
+    231 => 0,
 };
 
 #use constant start_stop => "o";
@@ -151,6 +153,19 @@ sub draw_path {
         $dir = $direction_list->[$errant_move];
         $self->{grid}[$x][$y] = arrow_chars->[$dir];
     }
+}
+
+
+sub draw_character {
+    my ($self, $color_hi, $start_coord, $character) = @_;
+
+    my $x = $start_coord->[0];
+    my $y = $start_coord->[1];
+
+    $self->{grid}[$x][$y] = $character;
+    $self->{gridcolor}[$x][$y] = $color_hi;
+
+    return;
 }
 
 
