@@ -1,6 +1,10 @@
+## Similar games
+
+The game is known by the names "[Numberlink](http://en.wikipedia.org/wiki/Numberlink)" and "Flow Free".  "Puzzleland Park" is a similar puzzle.
+
 ## Permutations
 
-The solution space can be viewed as a grid of arrows.  For example, for a 4x4 board:
+The solution space can be viewed as a grid of arrows.  For example, for a 5x5 board:
 
 <table>
 <tr><td>↓<td>→<td>↓<td>→<td>←
@@ -27,3 +31,8 @@ However, corners cells only have two possibilities, and edge cells only have thr
 </table>
 
 That's still an overestimate, however.  For each pair of start+end points, only the start-point permutes through all possible directions; once the end-point is reached, you don't travel to another cell.  So the end-point cells aren't counted.  This is more difficult to calculate (because end-points may be in the interior or on the edges/corners).  As a rough guide though, this may reduce the permutations by up to 10⁴.
+
+## Other solvers
+
+* [github.com/~imos](https://github.com/imos/Puzzle/tree/master/NumberLink)
+* ["Recursive Path-finding in a Dynamic Maze with Modified Tremaux's Algorithm"](http://www.waset.org/journals/waset/v60/v60-159.pdf)
