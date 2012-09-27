@@ -32,6 +32,14 @@ However, corners cells only have two possibilities, and edge cells only have thr
 
 That's still an overestimate, however.  For each pair of start+end points, only the start-point permutes through all possible directions; once the end-point is reached, you don't travel to another cell.  So the end-point cells aren't counted.  This is more difficult to calculate (because end-points may be in the interior or on the edges/corners).  As a rough guide though, this may reduce the permutations by up to 10⁴.
 
+## Current status
+
+This project is mothballed for now.   The solver isn't alpha quality yet.  Small portions of the recursive explorer are written, but it is nowhere near being in a working state.
+
+[This C version](https://github.com/imos/Puzzle/tree/master/NumberLink) works, and is quite fast.  If you're only looking to solve a specific board that you're stuck on, use that.
+
+I was disheartened somewhat after discovering the number of permutations required to solve this via brute-force.   I don't know how the C version works exactly, but it's likely that a constraint-propagation approach would be much faster (for instance, see [this writeup](http://mellowmelon.wordpress.com/2010/07/24/numberlink-primer/) on how Numberlink boards are solved by humans. It is clear that such an approach would reduce the number of permutations greatly)
+
 ## Other solvers
 
 * [github.com/~imos](https://github.com/imos/Puzzle/tree/master/NumberLink)
